@@ -13,5 +13,27 @@
     "password": {
       "isNotEmpty": "Password is required"
     }
+  },
+  "eventEntity": {
+    "name": "Event Name",
+    "description": "Event Description",
+    "date": "Event Date",
+    "location": "Event Location",
+    "title": {
+      "isNotEmpty": "Event title must not be empty"
+    },
+    "limit": {
+      "isNotEmpty": "Event limit must not be empty",
+      "isInt": "Event limit must be an integer"
+    },
+    "startDate": {
+      "isNotEmpty": "Event start date must not be empty",
+      "isDate": "Event start date must be a valid date"
+    },
+    "endDate": {
+      "isNotEmpty": "Event end date must not be empty",
+      "isDate": "Event end date must be a valid date",
+      "isAfter": "Event end date must be after start date"
+    }
   }
 }
