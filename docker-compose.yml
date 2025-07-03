@@ -1,0 +1,73 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: app-api
+    tty: true
+    ports:
+      - "${APP_PORT}:${APP_PORT}"
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - database
+    networks:
+      - app-network
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: app-worker
+    tty: true
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - database
+    networks:
+      - app-network
+
+  database:
+    image: postgres:15
+    container_name: app-database
+    volumes:
+      - database-data:/var/lib/postgresql/data
+    restart: always
+    ports:
+      - "${DATABASE_PORT}:5432"
+    environment:
+      POSTGRES_DB: "${DATABASE_NAME}"
+      POSTGRES_USER: "${DATABASE_USER}"
+      POSTGRES_PASSWORD: "${DATABASE_PASSWORD}"
+      TZ: "UTC"
+    networks:
+      - app-network
+
+  redis:
+    image: redis/redis-stack:latest
+    container_name: app-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+    environment:
+      REDIS_ARGS: "--requirepass redispass"
+    networks:
+      - app-network
+
+volumes:
+  database-data:
+  redis_data:
+
+networks:
+  app-network:
+    driver: bridge

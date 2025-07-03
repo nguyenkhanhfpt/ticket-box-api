@@ -1,0 +1,17 @@
+{
+  "E401": "Unauthorized",
+  "E403": "Not permission",
+  "E404": "Resource not found",
+  "E500": "Internal error",
+  "userEntity": {
+    "name": {
+      "isNotEmpty": "Name is required"
+    },
+    "email": {
+      "isNotEmpty": "Email is required"
+    },
+    "password": {
+      "isNotEmpty": "Password is required"
+    }
+  }
+}
