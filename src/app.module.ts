@@ -7,14 +7,15 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from '@modules/auth/auth.module';
 import databaseConfig from '@config/database.config';
 import appConfig from '@config/app.config';
-import { APP_GUARD } from '@nestjs/core';
-import { AccessTokenGuard } from '@guards';
+// import { APP_GUARD } from '@nestjs/core';
+// import { AccessTokenGuard } from '@guards';
 import { QueueModule } from '@modules/queue/queue.module';
 import { HeaderResolver, I18nModule } from 'nestjs-i18n';
 import { join } from 'path';
 import { LoggerModule } from '@modules/logger/logger.module';
 import { LoggerMiddleware } from '@shared/middlewares/logger.middleware';
 import { ClsModule } from 'nestjs-cls';
+import { EventModule } from '@modules/events/event.module';
 
 @Module({
   imports: [
@@ -46,13 +47,14 @@ import { ClsModule } from 'nestjs-cls';
     UsersModule,
     AuthModule,
     QueueModule,
+    EventModule,
   ],
   controllers: [AppController],
   providers: [
-    {
-      provide: APP_GUARD,
-      useClass: AccessTokenGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: AccessTokenGuard,
+    // },
     AppService,
   ],
 })
