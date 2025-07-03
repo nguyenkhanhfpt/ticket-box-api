@@ -35,5 +35,23 @@
       "isDate": "Event end date must be a valid date",
       "isAfter": "Event end date must be after start date"
     }
+  },
+  "ticketEntity": {
+    "email": {
+      "isNotEmpty": "Email is required",
+      "isEmail": "Email must be a valid email address"
+    },
+    "eventId": {
+      "isNotEmpty": "Event ID is required",
+      "isInt": "Event ID must be an integer"
+    },
+    "code": {
+      "isNotEmpty": "Ticket code is required",
+      "isString": "Ticket code must be a string"
+    },
+    "status": {
+      "isNotEmpty": "Ticket status is required",
+      "isEnum": "Ticket status must be one of the predefined values"
+    }
   }
 }

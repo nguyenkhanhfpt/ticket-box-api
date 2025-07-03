@@ -16,6 +16,7 @@ import { LoggerModule } from '@modules/logger/logger.module';
 import { LoggerMiddleware } from '@shared/middlewares/logger.middleware';
 import { ClsModule } from 'nestjs-cls';
 import { EventModule } from '@modules/events/event.module';
+import { TicketModule } from '@modules/tickets/ticket.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { EventModule } from '@modules/events/event.module';
     AuthModule,
     QueueModule,
     EventModule,
+    TicketModule,
   ],
   controllers: [AppController],
   providers: [
