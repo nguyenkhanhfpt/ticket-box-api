@@ -22,15 +22,31 @@ export class TicketService {
     return tickets.length;
   }
 
+  async isEmailRegistered(eventId: number, email: string): Promise<boolean> {
+    const ticket = await this.ticketRepository.findOne({
+      where: { email, eventId },
+      select: ['id'],
+    });
+
+    return !!ticket;
+  }
+
   /**
    * Validate the event before buying a ticket
    * @param eventId - The ID of the event to validate
+   * @param email - The email of the user trying to buy a ticket
+   * @throws {Error} - Throws an error if the event is not found, email
    * @returns {Promise<boolean>} - Returns true if the event is valid, otherwise throws an error
    */
-  async validateEvent(eventId: number): Promise<boolean> {
+  async validateEvent(eventId: number, email: string): Promise<boolean> {
     const event = await this.eventService.getEventById(eventId, ['limit']);
     if (!event) {
       throw new Error('Event not found');
+    }
+
+    const isEmailRegistered = await this.isEmailRegistered(eventId, email);
+    if (isEmailRegistered) {
+      throw new Error('Email is already registered for this event');
     }
 
     const numberOfTickets = await this.getNumberOfTickets(eventId);
@@ -49,7 +65,7 @@ export class TicketService {
    * @returns {Promise<any>} - Returns a success message and the created ticket
    */
   async buyTicket(createTicketDto: CreateTicketDto): Promise<any> {
-    const isValid = await this.validateEvent(createTicketDto.eventId);
+    const isValid = await this.validateEvent(createTicketDto.eventId, createTicketDto.email);
     if (!isValid) {
       throw new Error('Invalid event');
     }
