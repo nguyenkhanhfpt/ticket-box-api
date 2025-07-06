@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateTicketDto } from './dtos/req/create.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TicketEntity } from '@database/entities/ticket.entity';
@@ -10,7 +10,7 @@ export class TicketService {
   constructor(
     @InjectRepository(TicketEntity)
     private readonly ticketRepository: Repository<TicketEntity>,
-    private readonly eventService: EventService, // Assuming EventService is used for some operations
+    private readonly eventService: EventService,
   ) {}
 
   async getNumberOfTickets(eventId: number): Promise<number> {
@@ -65,17 +65,22 @@ export class TicketService {
    * @returns {Promise<any>} - Returns a success message and the created ticket
    */
   async buyTicket(createTicketDto: CreateTicketDto): Promise<any> {
-    const isValid = await this.validateEvent(createTicketDto.eventId, createTicketDto.email);
-    if (!isValid) {
-      throw new Error('Invalid event');
+    try {
+      const isValid = await this.validateEvent(createTicketDto.eventId, createTicketDto.email);
+      if (!isValid) {
+        throw new Error('Invalid event');
+      }
+
+      const ticket = this.ticketRepository.create({
+        ...createTicketDto,
+        code: Math.random().toString(36).substring(2, 15),
+      });
+
+      await this.ticketRepository.save(ticket);
+
+      return { message: 'Ticket purchased successfully', data: ticket };
+    } catch (error) {
+      throw new BadRequestException(`Failed to buy ticket: ${error.message}`);
     }
-
-    const ticket = this.ticketRepository.create({
-      ...createTicketDto,
-      code: Math.random().toString(36).substring(2, 15),
-    });
-    await this.ticketRepository.save(ticket);
-
-    return { message: 'Ticket purchased successfully', data: ticket };
   }
 }
