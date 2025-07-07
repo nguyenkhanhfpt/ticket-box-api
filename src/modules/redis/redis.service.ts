@@ -1,10 +1,16 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import Redis from 'ioredis';
+import { ConfigService } from '@nestjs/config/dist/config.service';
+import Redlock from 'redlock';
 
 @Injectable()
 export class RedisService {
-  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
+  constructor(
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private configService: ConfigService,
+  ) {}
 
   /**
    * Get a value from the cache
@@ -45,5 +51,22 @@ export class RedisService {
    */
   async wrap<T>(key: string, fn: () => Promise<T>, ttl?: number): Promise<T> {
     return await this.cacheManager.wrap(key, fn, ttl);
+  }
+
+  createRedisClient() {
+    return new Redis({
+      host: this.configService.get('app.redis.host'),
+      port: this.configService.get('app.redis.port'),
+      password: this.configService.get('app.redis.password'),
+    });
+  }
+
+  async createRedlock() {
+    const redisClient = this.createRedisClient();
+
+    return new Redlock([redisClient], {
+      retryCount: 10,
+      retryDelay: 200, // time in ms
+    });
   }
 }
