@@ -6,6 +6,15 @@ import json
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from typing import Dict, Any, List, Tuple
 
+"""
+    source venv/bin/activate
+
+    python script.py --eventId 1 --requests 100 --processes 4 --url http://localhost:4000/api/v1/tickets
+
+    python script.py --eventId x
+"""
+
+
 def make_request(request_data: Tuple[int, Dict[str, Any], str]) -> Dict[str, Any]:
     """
     Make a single POST request to the API endpoint
@@ -31,7 +40,7 @@ def make_request(request_data: Tuple[int, Dict[str, Any], str]) -> Dict[str, Any
         return {
             'request_id': request_id,
             'status_code': response.status_code,
-            'success': response.status_code == 200,
+            'success': response.status_code == 200 or response.status_code == 201,
             'response_time': end_time - start_time,
             'response_body': response.text[:500] if response.text else None,  # Limit response size
             'error': response.json()
@@ -160,7 +169,7 @@ def print_summary(results: List[Dict[str, Any]]):
             print(f"  Request {error['request_id']}: {error['error']}")
 
 def main():
-    TARGET_URL = 'http://localhost:4000/api/v1/tickets'
+    TARGET_URL = 'http://localhost:4000/api/v1/tickets/redis'
     parser = argparse.ArgumentParser(description='Make multiple POST requests to API endpoint')
     parser.add_argument('--eventId', '-e', type=int, default=1,
                        help='Event ID to register for (default: 1)')
@@ -191,10 +200,9 @@ def main():
     print(f"  Output file: {args.output or 'None'}")
     print()
     
-    # Run the requests
+    # Run the requests in parallel
     results = run_parallel_requests(args.eventId, args.requests, args.processes, args.url)
 
-    # Print summary
     print_summary(results)
     
     # Save results to file if specified

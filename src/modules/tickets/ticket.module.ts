@@ -4,10 +4,10 @@ import { TicketEntity } from '@database/entities/ticket.entity';
 import { TicketController } from './ticket.controller';
 import { TicketService } from './ticket.service';
 import { EventModule } from '@modules/events/event.module';
-import { EventService } from '@modules/events/event.service';
+import { RedisModule } from '@modules/redis';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([TicketEntity]), EventModule],
+  imports: [TypeOrmModule.forFeature([TicketEntity]), EventModule, RedisModule],
   controllers: [TicketController],
   providers: [TicketService],
   exports: [TicketService],

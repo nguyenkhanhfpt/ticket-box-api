@@ -10,4 +10,9 @@ export class TicketController {
   async buyTicket(@Body() createTicketDto: CreateTicketDto): Promise<any> {
     return this.ticketService.buyTicket(createTicketDto);
   }
+
+  @Post('redis')
+  async redisBuyTicket(@Body() createTicketDto: CreateTicketDto): Promise<any> {
+    return this.ticketService.buyTicket(createTicketDto, 'redis');
+  }
 }
